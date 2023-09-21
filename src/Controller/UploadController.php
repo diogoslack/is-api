@@ -50,6 +50,7 @@ class UploadController extends AbstractController
         $file->setHeaders(implode(';', array_values($headers[1])));
         $file->setTotalLines($strategy->getTotalLines());
         $file->setProcessed(false);
+        $file->setMapped(false);
         $file->setUpdatedAt(new DateTime($currentDateTime));
         $file->setCreatedAt(new DateTimeImmutable($currentDateTime));
 

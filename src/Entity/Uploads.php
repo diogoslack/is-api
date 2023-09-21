@@ -20,7 +20,7 @@ class Uploads
     #[ORM\Column(length: 255)]
     private ?string $headers = null;
 
-    #[ORM\Column(type: Types::SIMPLE_ARRAY, nullable: true)]
+    #[ORM\Column(type: Types::JSON, nullable: true)]
     private ?array $fields_mapping = null;
 
     #[ORM\Column(length: 100)]
@@ -31,6 +31,9 @@ class Uploads
 
     #[ORM\Column]
     private ?bool $processed = null;
+
+    #[ORM\Column]
+    private ?bool $mapped = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $updated_at = null;
@@ -111,6 +114,18 @@ class Uploads
     public function setProcessed(bool $processed): static
     {
         $this->processed = $processed;
+
+        return $this;
+    }
+
+    public function isMapped(): ?bool
+    {
+        return $this->mapped;
+    }
+
+    public function setMapped(bool $mapped): static
+    {
+        $this->mapped = $mapped;
 
         return $this;
     }
