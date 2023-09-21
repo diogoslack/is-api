@@ -4,12 +4,17 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    region: '%env(AWS_S3_REGION)%'
+    bucket: '%env(AWS_BUCKET_NAME)%'
+    credentials:
+        key: '%env(AWS_KEY)%'
+        secret: '%env(AWS_SECRET_KEY)%'
 
 services:
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
-        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.    
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -21,4 +26,9 @@ services:
             - '../src/Kernel.php'
 
     # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    # please note that last definitions always *replace* previous ones    
+    App\Adapters\UploadFileHandler\S3\S3UploadFileHandler:
+        bind:
+            $aws_region: '%region%'
+            $aws_bucket: '%bucket%'
+            $aws_credentials: '%credentials%'

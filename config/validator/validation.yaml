@@ -1,0 +1,14 @@
+App\Entity\Uploads:
+    properties:
+        file:
+            - NotBlank:
+                message: File field is required
+        type:
+            - Choice:
+                choices: [Csv, Xlsx]
+                message: Only CSV and XLSX files are supported
+        total_lines:
+            - Range:
+                min: 0
+                max: 50000
+                notInRangeMessage: The file should have between {{ min }} and {{ max }} lines
