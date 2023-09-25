@@ -7,6 +7,7 @@ use App\Entity\Uploads;
 use App\FileReader\FileReader;
 use App\FileReader\Readers\Csv;
 use App\FileReader\Readers\Xlsx;
+use App\FileReader\Filters\HeaderOnlyFilter;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -40,7 +41,7 @@ class UploadController extends AbstractController
         }
 
         $fileReader->setStrategy($strategy);
-        $reader = $fileReader->getReader(null);
+        $reader = $fileReader->getReader(new HeaderOnlyFilter());
 
         $headers = $reader->getActiveSheet()->toArray(null, true, true, true);
 

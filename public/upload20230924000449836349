@@ -1,0 +1,66 @@
+Model Data
+----------
+Data can be retrieved from the model object using the get() method of the
+model (e.g., `$result->get($key)`) or "accessing the result like an
+associative array (e.g. `$result['key']`). You can also execute JMESPath
+expressions on the result data using the search() method.
+
+{
+    "Body": {},
+    "DeleteMarker": false,
+    "AcceptRanges": "bytes",
+    "Expiration": "",
+    "Restore": "",
+    "LastModified": "2023-09-23T22:02:01+00:00",
+    "ContentLength": 12646,
+    "ETag": "\"29113f84749f44a1035a0118732bb14f\"",
+    "ChecksumCRC32": "",
+    "ChecksumCRC32C": "",
+    "ChecksumSHA1": "",
+    "ChecksumSHA256": "",
+    "MissingMeta": "",
+    "VersionId": "",
+    "CacheControl": "",
+    "ContentDisposition": "",
+    "ContentEncoding": "",
+    "ContentLanguage": "",
+    "ContentRange": "",
+    "ContentType": "application\/octet-stream",
+    "Expires": "1970-01-01T00:00:00+00:00",
+    "WebsiteRedirectLocation": "",
+    "ServerSideEncryption": "AES256",
+    "Metadata": [],
+    "SSECustomerAlgorithm": "",
+    "SSECustomerKeyMD5": "",
+    "SSEKMSKeyId": "",
+    "BucketKeyEnabled": false,
+    "StorageClass": "",
+    "RequestCharged": "",
+    "ReplicationStatus": "",
+    "PartsCount": "",
+    "TagCount": "",
+    "ObjectLockMode": "",
+    "ObjectLockRetainUntilDate": "1970-01-01T00:00:00+00:00",
+    "ObjectLockLegalHoldStatus": "",
+    "@metadata": {
+        "statusCode": 200,
+        "effectiveUri": "https:\/\/is-api-bucket.s3.eu-west-1.amazonaws.com\/upload20230924000159847222",
+        "headers": {
+            "x-amz-id-2": "85nQfUnNNlriJz6VRrWpV+5daSLHG41jhkLIoiTYM+gVrPo23z9UZvOf0KBh7HsOG2WcdFATsmo=",
+            "x-amz-request-id": "Z7NZHDB78F8DM690",
+            "date": "Sat, 23 Sep 2023 22:04:51 GMT",
+            "last-modified": "Sat, 23 Sep 2023 22:02:01 GMT",
+            "etag": "\"29113f84749f44a1035a0118732bb14f\"",
+            "x-amz-server-side-encryption": "AES256",
+            "accept-ranges": "bytes",
+            "content-type": "application\/octet-stream",
+            "server": "AmazonS3",
+            "content-length": "12646"
+        },
+        "transferStats": {
+            "http": [
+                []
+            ]
+        }
+    }
+}

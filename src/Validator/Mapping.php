@@ -18,9 +18,7 @@ class MappingValidator
     ];
     $this->optionalFields = [
       'object_categoryName',
-      'object_code',
-      'field_dataType',
-      'field_options'
+      'object_code'
     ];
   }
 

@@ -2,13 +2,16 @@
 
 namespace App\Controller;
 
+use App\Message\ProcessFileNotification;
 use App\Repository\UploadsRepository;
 use App\Validator\MappingValidator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
+
 
 
 class MappingController extends AbstractController
@@ -76,8 +79,11 @@ class MappingController extends AbstractController
     }
 
     #[Route('/mapping/{id}', name: 'app_mapping_post', requirements: ['id' => '\d+'], methods: ['POST'])]
-    public function doMapping(int $id, Request $request): JsonResponse
-    {
+    public function doMapping(
+        int $id,
+        Request $request,
+        MessageBusInterface $bus
+    ): JsonResponse {
         $upload =  $this->repository->findOneBy([
             'processed' => false,
             'mapped' => false,
@@ -101,6 +107,8 @@ class MappingController extends AbstractController
         
         $this->em->persist($upload);
         $this->em->flush();
+
+        $bus->dispatch(new ProcessFileNotification($id));
 
         return $this->json([
             'message' => 'The file was sucessful mapped!',

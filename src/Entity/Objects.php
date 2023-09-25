@@ -7,14 +7,16 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 
 #[ORM\Entity(repositoryClass: ObjectsRepository::class)]
 class Objects
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'uuid')]
-    private ?int $id = null;
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
+    private $id = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -42,7 +44,7 @@ class Objects
     #[ORM\Column]
     private ?\DateTimeImmutable $created_at = null;
 
-    #[ORM\ManyToMany(targetEntity: Fields::class)]
+    #[ORM\OneToMany(targetEntity: ObjectsFieldsValues::class, mappedBy: Fields::class)]
     private Collection $object_props;
 
     public function __construct()
@@ -105,7 +107,7 @@ class Objects
 
     public function getLatitude()
     {
-        return $this->latitude;
+        return $this->latitude->getY();
     }
 
     public function setLatitude($latitude): static
@@ -117,7 +119,7 @@ class Objects
 
     public function getLongitude()
     {
-        return $this->longitude;
+        return $this->longitude->getX();
     }
 
     public function setLongitude($longitude): static
@@ -159,7 +161,7 @@ class Objects
         return $this->object_props;
     }
 
-    public function addObjectProp(Fields $objectProp): static
+    public function addObjectProp(ObjectsFieldsValues $objectProp): static
     {
         if (!$this->object_props->contains($objectProp)) {
             $this->object_props->add($objectProp);
@@ -168,7 +170,7 @@ class Objects
         return $this;
     }
 
-    public function removeObjectProp(Fields $objectProp): static
+    public function removeObjectProp(ObjectsFieldsValues $objectProp): static
     {
         $this->object_props->removeElement($objectProp);
 

@@ -42,7 +42,7 @@ class S3UploadFileHandler implements UploadFileHandlerInterface
 
             if(!empty($result_arr['ObjectURL'])) {
                 unlink($file->getPathName());
-                return $result_arr['ObjectURL'];
+                return $fileName;
             } else {
                 return ['errors' => 'Upload Failed!'];
             }
@@ -51,8 +51,19 @@ class S3UploadFileHandler implements UploadFileHandlerInterface
         }
     }
 
-    public function remove($id)
+    public function get($file)
     {
-
+        try {
+            $tmpDirectory = sys_get_temp_dir() . DIRECTORY_SEPARATOR;
+            $newFileName =  'upload' . date('YmdHis') . rand(100000,999999);
+            $file = $this->s3Client->getObject([
+                'Bucket' => $this->aws_bucket,
+                'Key' => $file,
+                'SaveAs' => $tmpDirectory . $newFileName
+            ]);
+            return $tmpDirectory . $newFileName;
+        } catch (Exception $exception) {
+            echo "Failed to download $file from $this->aws_bucket with error: " . $exception->getMessage();
+        }
     }
 }

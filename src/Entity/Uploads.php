@@ -41,6 +41,9 @@ class Uploads
     #[ORM\Column]
     private ?\DateTimeImmutable $created_at = null;
 
+    #[ORM\Column(type: Types::ARRAY, nullable: true)]
+    private ?array $errors = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -150,6 +153,18 @@ class Uploads
     public function setCreatedAt(\DateTimeImmutable $created_at): static
     {
         $this->created_at = $created_at;
+
+        return $this;
+    }
+
+    public function getErrors(): ?array
+    {
+        return $this->errors;
+    }
+
+    public function setErrors(?array $errors): static
+    {
+        $this->errors = $errors;
 
         return $this;
     }
