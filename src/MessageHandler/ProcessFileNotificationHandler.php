@@ -3,11 +3,8 @@
 namespace App\MessageHandler;
 
 use App\Adapters\UploadFileHandler\S3\S3UploadFileHandler;
-use App\Entity\Categories;
 use App\Entity\Objects;
-use App\Entity\Fields;
 use App\Entity\ObjectsFieldsValues;
-use App\Entity\Sectors;
 use App\FileReader\FileReader;
 use App\FileReader\Readers\Csv;
 use App\FileReader\Readers\Xlsx;
@@ -29,7 +26,6 @@ class ProcessFileNotificationHandler
 {
     const DEFAULT_CODE = 1;
     const DEFAULT_CATEGORY_ID = 1;
-    private $errors = [];
 
     public function __construct(
         private UploadsRepository $repository,
