@@ -21,6 +21,20 @@ class SectorsRepository extends ServiceEntityRepository
         parent::__construct($registry, Sectors::class);
     }
 
+    public function findOneByOrCreate(array $search, string $name)
+    {
+        $sector = $this->findOneBy($search);
+        if (!$sector) {
+            $sector = new Sectors();
+            $sector->setName($name);
+            $this->_em->beginTransaction();
+            $this->_em->persist($sector);
+            $this->_em->flush();
+            $this->_em->commit();
+        }
+        return $sector;
+    }
+
 //    /**
 //     * @return Sectors[] Returns an array of Sectors objects
 //     */

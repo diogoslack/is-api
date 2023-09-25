@@ -21,6 +21,20 @@ class CategoriesRepository extends ServiceEntityRepository
         parent::__construct($registry, Categories::class);
     }
 
+    public function findOneByOrCreate(array $search, string $name)
+    {
+        $category = $this->findOneBy($search);
+        if (!$category) {
+            $category = new Categories();
+            $category->setName($name);
+            $this->_em->beginTransaction();
+            $this->_em->persist($category);
+            $this->_em->flush();
+            $this->_em->commit();
+        }
+        return $category;
+    }
+
 //    /**
 //     * @return Categories[] Returns an array of Categories objects
 //     */

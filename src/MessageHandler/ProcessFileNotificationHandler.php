@@ -82,119 +82,65 @@ class ProcessFileNotificationHandler
         $mapping = $file->getFieldsMapping();
 
         foreach($rows as $index => $row) {
-            // ignore header
-            if ($index == 1) {
-                continue;
-            }
+            try {
+                $isEmptyRow = $reader->getActiveSheet()->isEmptyRow($index, 3);            
 
-            $object = new Objects();
-            $rowValues = array_values($row);
-            $currentDateTime = date('Y-m-d H:i:s');
-            $objectFields = [];
-
-            foreach($headers as $key => $header) {
-                $newField = $mapping[$header];
-                $value = $rowValues[$key];
-                $originalField = $header;
-
-                switch ($newField) {
-                    case 'object_oid':
-                        try {
-                            $object->setOid($value);
-                        } catch (Exception $e) {
-                            $this->log->setLog($index . ': Invalid Oid');
-                        }
-                        break;
-
-                    case 'object_sectorName':
-                        try {
-                            $sector = $this->sectorsRepository->findOneBy(['name' => $value]);
-                            if (!$sector) {
-                                $sector = new Sectors();
-                                $sector->setName($value);
-
-                                $this->em->beginTransaction();
-                                $this->em->persist($sector);
-                                $this->em->flush();
-                                $this->em->commit();
-                            }
-                            $object->setSector($sector);
-                        } catch (Exception $e) {
-                            $this->em->rollback();
-                            $this->log->setLog($index . ': Invalid Sector');
-                        }                        
-                        break;
-
-                    case 'object_latitude':
-                        $latitude = str_replace(',', '.', $value);
-                        break;
-
-                    case 'object_longitude':
-                        $longitude = str_replace(',', '.', $value);
-                        break;
-
-                    case 'object_categoryName':
-                        try {
-                            $category = $this->categoriesRepository->findOneBy(['name' => $value]);
-                            if (!$category) {
-                                $category = new Categories();
-                                $category->setName($value);
-                                $this->em->beginTransaction();
-                                $this->em->persist($category);
-                                $this->em->flush();
-                                $this->em->commit();
-                            }
-                            $object->setCategory($category);
-                        } catch (Exception $e) {
-                            $this->em->rollback();
-                            $this->log->setLog($index . ': Invalid category');
-                        }                        
-                        break;
-
-                    case 'object_code':
-                        try {
-                            $object->setCode($value);
-                        } catch (Exception $e) {
-                            $this->log->setLog($index . ': Invalid object code');
-                        }                        
-                        break;
-
-                    case 'field_value':
-                        try {
-                            $fields = $this->fieldsRepository->findOneBy(['name' => $originalField]);
-                            if (!$fields) {
-                                $fields = new Fields();
-                                $fields->setName($originalField);
-                                $fields->setOptions('');
-                                $fields->setDataType('');
-                                $fields->setUpdatedAt(new DateTime($currentDateTime));
-                                $fields->setCreatedAt(new DateTimeImmutable($currentDateTime));
-                                $this->em->beginTransaction();
-                                $this->em->persist($fields);
-                                $this->em->flush();
-                                $this->em->commit();
-                            }
-                            $objectField = new ObjectsFieldsValues();
-                            $objectField->setFields($fields);                        
-                            $objectField->setValue($value);
-                            $objectFields[] = $objectField;  
-                        } catch (Exception $e) {
-                            $this->em->rollback();
-                            $this->log->setLog($index . ': Invalid field name/value');
-                        }                                              
+                // ignore header
+                if ($index == 1 || $isEmptyRow) {
+                    continue;
                 }
-            }
 
-            try {            
+                $object = new Objects();
+                $rowValues = array_values($row);
+                $currentDateTime = date('Y-m-d H:i:s');
+                $objectFields = [];
+
+                foreach($headers as $key => $header) {
+                    $newField = $mapping[$header];
+                    $value = $rowValues[$key];
+                    $originalField = $header;
+
+                    switch ($newField) {
+                        case 'object_oid':
+                            $object->setOid($value);
+                            break;
+
+                        case 'object_sectorName':
+                            $sector = $this->sectorsRepository->findOneByOrCreate(['name' => $value], $value);
+                            $object->setSector($sector);                       
+                            break;
+
+                        case 'object_latitude':
+                            $latitude = str_replace(',', '.', $value);
+                            break;
+
+                        case 'object_longitude':
+                            $longitude = str_replace(',', '.', $value);
+                            break;
+
+                        case 'object_categoryName':
+                            $category = $this->categoriesRepository->findOneByOrCreate(['name' => $value], $value);
+                            $object->setCategory($category);                       
+                            break;
+
+                        case 'object_code':
+                            $object->setCode($value);                        
+                            break;
+
+                        case 'field_value':
+                            $fields = $this->fieldsRepository->findOneByOrCreate(['name' => $originalField], $value);
+                            $objectField = new ObjectsFieldsValues();
+                            $objectField->setFields($fields);
+                            $objectField->setValue($value);
+                            $objectFields[] = $objectField;                                            
+                    }
+                }
+
                 $coordinates = new Point($latitude, $longitude);
                 //@TODO set only a value per field
                 $object->setLongitude($coordinates);
                 $object->setLatitude($coordinates);
-            } catch (Exception $e) {
-                $this->log->setLog($index . ': Invalid latitude/longitude');
-            }
 
-            try {
                 // Apply default values for optional fields
                 if (!$object->getCode()) {
                     $object->setCode(self::DEFAULT_CODE);
@@ -222,15 +168,12 @@ class ProcessFileNotificationHandler
                 $this->em->flush();
                 $this->em->commit();
             } catch (Exception $e) {
-                $this->em->rollback();
-                $this->log->setLog($index . ': Error setting fields');
+                $this->log->setLog('Error on line ' . $index . ': ' . $e->getMessage());
             }
         }
 
         // update file info on db
-        if (count($this->log->getLogs())) {
-            $file->setErrors($this->log->getLogs());
-        }
+        $file->setErrors($this->log->getLogs());
         $file->setProcessed(true);
         $this->em->persist($file);
         $this->em->flush();

@@ -21,6 +21,20 @@ class FieldsRepository extends ServiceEntityRepository
         parent::__construct($registry, Fields::class);
     }
 
+    public function findOneByOrCreate(array $search, string $name)
+    {
+        $fields = $this->findOneBy($search);
+        if (!$fields) {
+            $fields = new Fields();
+            $fields->setName($name);
+            $this->_em->beginTransaction();
+            $this->_em->persist($fields);
+            $this->_em->flush();
+            $this->_em->commit();
+        }
+        return $fields;
+    }
+
 //    /**
 //     * @return Fields[] Returns an array of Fields objects
 //     */
